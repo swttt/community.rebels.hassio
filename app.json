@@ -1,0 +1,58 @@
+{
+  "id": "community.rebels.hassio",
+  "version": "1.0.0",
+  "compatibility": ">=1.5.0",
+  "sdk": 2,
+  "name": {
+    "en": "Hass.io"
+  },
+  "description": {
+    "en": "Better zigbee, z-wave, bluetooth and more...."
+  },
+  "category": [
+    "tools"
+  ],
+  "permissions": [],
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "author": {
+    "name": "Bas Jansen",
+    "email": "b@sjansen.email"
+  },
+  "drivers": [{
+    "id": "light",
+    "name": {
+      "en": "Light"
+    },
+    "class": "light",
+    "capabilities": [
+      "dim",
+      "light_hue",
+      "light_mode",
+      "light_saturation",
+      "light_temperature",
+      "onoff"
+    ],
+    "images": {
+      "large": "/drivers/light/assets/images/large.png",
+      "small": "/drivers/light/assets/images/small.png"
+    },
+    "pair": [{
+        "id": "list_devices",
+        "template": "list_devices",
+        "navigation": {
+          "next": "add_devices"
+        },
+        "options": {
+          "singular": false
+        }
+      },
+      {
+        "id": "add_devices",
+        "template": "add_devices"
+      }
+    ]
+  }]
+}
