@@ -1,0 +1,24 @@
+{
+  "name": "community.rebels.hassio",
+  "version": "1.0.0",
+  "description": "Better zigbee, z-wave, bluetooth and more....",
+  "main": "app.js",
+  "dependencies": {
+    "homeassistant": "^0.1.4",
+    "node-homeassistant": "^1.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swttt/community.rebels.hassio.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/swttt/community.rebels.hassio/issues"
+  },
+  "homepage": "https://github.com/swttt/community.rebels.hassio#readme"
+}

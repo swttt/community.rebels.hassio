@@ -1,11 +1,11 @@
 'use strict';
 
 const Homey = require( 'homey' );
-const WebSocket = require( 'ws' );
-global.WebSocket = WebSocket;
-const HAWS = require( "home-assistant-js-websocket" );
+const HomeAssistant = require( 'homeassistant' );
 
-const getWsUrl = haUrl => `ws://${haUrl}/api/websocket`;
+const hass = new HomeAssistant( {
+  host: 'http://192.168.2.20'
+} );
 
 class MyDriver extends Homey.Driver {
 
@@ -15,26 +15,23 @@ class MyDriver extends Homey.Driver {
 
   onPairListDevices( data, callback ) {
 
-    HAWS.createConnection( getWsUrl( '192.168.2.20:8123' ) ).then( conn => {
-        HAWS.subscribeEntities( conn, logEntities );
-      },
-      err => console.error( 'Connection failed with code', err )
-    );
+    let devices = []
 
-    function logEntities( entities ) {
-      Object.keys( entities ).forEach( key => console.log( `${key}: ${entities[key].state}` ) );
-      console.log( '' )
-    }
+    hass.states.list()
+      .then( data => {
 
-    let devices = [
-    {
-      "name": "My Device",
-      "data": {
-        "id": "abcd"
-      }
-    } ]
-
-    callback( null, devices );
+        Object.keys( data ).forEach( function ( key ) {
+          if ( data[ key ].entity_id.startsWith( 'light.' ) ) {
+            let device = {}
+            device.name = data[key].attributes.friendly_name
+            device.data = {}
+            device.data.id = data[key].entity_id
+            device.data.attributes = data[key].attributes
+            devices.push(device)
+          }
+        } )
+        callback( null, devices );
+      } );
 
   }
 
