@@ -22,11 +22,13 @@ class MyDriver extends Homey.Driver {
 
         Object.keys( data ).forEach( function ( key ) {
           if ( data[ key ].entity_id.startsWith( 'light.' ) ) {
-            let device = {}
-            device.name = data[key].attributes.friendly_name
-            device.data = {}
-            device.data.id = data[key].entity_id
-            device.data.attributes = data[key].attributes
+            let device = {
+              "name": data[key].attributes.friendly_name,
+              "data": {
+                "id": data[key].entity_id,
+                "attributes": data[key].attributes
+              }
+            }
             devices.push(device)
           }
         } )
