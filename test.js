@@ -21,12 +21,10 @@ ha.connect().then( () => {
 hass.states.list()
   .then( data => {
 
-      Object.keys( data ).forEach( function ( key ) {
-        if ( data[key].entity_id.startsWith( 'light.' ) ) {
-          console.log( data[key].attributes.friendly_name )
-        }
+    Object.keys( data ).forEach( function ( key ) {
+      if ( data[ key ].entity_id.startsWith( 'light.' ) ) {
+        console.log( data[ key ].attributes.friendly_name )
+      }
+    } )
 
-      } );
-
-    }
-  );
+  } );
