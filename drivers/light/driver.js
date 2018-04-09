@@ -24,11 +24,13 @@ class MyDriver extends Homey.Driver {
           if ( data[ key ].entity_id.startsWith( 'light.' ) ) {
             let device = {
               "name": data[key].attributes.friendly_name,
+              "capabilities": [],
               "data": {
                 "id": data[key].entity_id,
                 "attributes": data[key].attributes
               }
             }
+
             devices.push(device)
           }
         } )

@@ -23,7 +23,7 @@ hass.states.list()
 
     Object.keys( data ).forEach( function ( key ) {
       if ( data[ key ].entity_id.startsWith( 'light.' ) ) {
-        console.log( data[ key ].attributes.friendly_name )
+        console.log( data[ key ])
       }
     } )
 
