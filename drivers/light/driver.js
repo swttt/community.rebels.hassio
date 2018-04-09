@@ -1,11 +1,16 @@
 'use strict';
 
 const Homey = require( 'homey' );
-const HomeAssistant = require( 'homeassistant' );
+const axios = require( 'axios' )
 
-const hass = new HomeAssistant( {
-  host: 'http://192.168.2.20'
+const http = axios.create( {
+  baseURL: 'http://192.168.2.20:8123/api/',
+  timeout: 1000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 } );
+
 
 class MyDriver extends Homey.Driver {
 
@@ -17,9 +22,9 @@ class MyDriver extends Homey.Driver {
 
     let devices = []
 
-    hass.states.list()
-      .then( data => {
-
+    http.get( 'states' )
+      .then( result => {
+        let data = result.data
         Object.keys( data ).forEach( function ( key ) {
           if ( data[ key ].entity_id.startsWith( 'light.' ) ) {
             let device = {
