@@ -11,7 +11,7 @@ var es = new EventSource(url, config);
 class MyApp extends Homey.App {
 
 	onInit() {
-		this.log('Start hass.io...');
+		this.log('Started hass.io...');
 
 		es.onopen = function() {
 		  console.log("Connection to server opened.");
@@ -21,7 +21,6 @@ class MyApp extends Homey.App {
 		  if(msg.data !== "ping"){
 		    let data = JSON.parse(msg.data);
 		    if(data.event_type === "state_changed"){
-		      console.log(data.data.entity_id);
 					EventBus.dispatch(data.data.entity_id, data.data)
 		    }
 		  }
