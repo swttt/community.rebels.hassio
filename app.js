@@ -1,32 +1,101 @@
 'use strict';
 
-const Homey = require('homey');
-const EventBus = require('eventbusjs');
-const EventSource = require('eventsource')
+// SETTINGS
+const IP = "192.168.2.20"
+const PORT = "8123"
+const PASSWORD = "Password"
 
-const config = {headers: {'Content-Type': 'application/json'}}
-const url = "http://192.168.2.20:8123/api/stream"
-var es = new EventSource(url, config);
+// LIBS
+const Homey = require( 'homey' );
+const EventBus = require( 'eventbusjs' );
+const EventSource = require( 'eventsource' )
+const axios = require( 'axios' )
 
-class MyApp extends Homey.App {
+// HEADERS CONFIG
+const config = {
+  headers: {
+    'Content-Type': 'application/json',
+		'x-ha-access': PASSWORD
+  }
+}
 
-	onInit() {
-		this.log('Started hass.io...');
+// ESS
+const url = "http://" + IP + ":" + PORT + "/api/stream"
+var es = new EventSource( url, config );
 
-		es.onopen = function() {
-		  console.log("Connection to server opened.");
-		};
+// REST
+const http = axios.create( {
+  baseURL: 'http://' + IP + ':' + PORT + '/api/',
+  timeout: 1000,
+  config
+} );
 
-		es.onmessage = (msg) =>{
-		  if(msg.data !== "ping"){
-		    let data = JSON.parse(msg.data);
-		    if(data.event_type === "state_changed"){
-					EventBus.dispatch(data.data.entity_id, data.data)
-		    }
-		  }
-		}
-	}
+class HassIO extends Homey.App {
+
+	// CALL A SINGLE SERVICE
+  callService( domain, service, data ) {
+    return new Promise(
+      ( resolve, reject ) => {
+        console.log( domain, service, data )
+        http.post( 'services/' + domain + '/' + service, data )
+          .then( ( result ) => {
+            resolve( result )
+          } )
+          .catch( ( err ) => {
+            console.log( err )
+            reject( err )
+          } );
+      }
+    );
+  }
+
+	// GET A SINGLE STATE
+  getState( id ) {
+    return new Promise(
+      ( resolve, reject ) => {
+        http.get( 'states/' + id )
+          .then( ( result ) => {
+            resolve( result.data )
+          } )
+          .catch( ( err ) => {
+            reject( err )
+          } );
+      }
+    );
+  }
+
+	// GET ALL STATES
+  getStates() {
+    return new Promise(
+      ( resolve, reject ) => {
+        http.get( 'states' )
+          .then( ( result ) => {
+            resolve( result.data )
+          } )
+          .catch( ( err ) => {
+            reject( err )
+          } );
+      }
+    );
+  }
+
+  onInit() {
+    this.log( 'Started hass.io...' );
+
+    es.onopen = function () {
+      console.log( "Connection to server opened." );
+    };
+		
+    es.onmessage = ( msg ) => {
+      if ( msg.data !== "ping" ) {
+        let data = JSON.parse( msg.data );
+        if ( data.event_type === "state_changed" ) {
+          EventBus.dispatch( data.data.entity_id, data.data )
+        }
+      }
+    }
+  }
 
 }
 
-module.exports = MyApp;
+module.exports = HassIO;
