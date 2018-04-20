@@ -12,21 +12,6 @@
   "category": [
     "tools"
   ],
-  "capabilities": {
-    "boolean_capability": {
-      "type": "number",
-"units": {
-        "en": "lm",
-        "nl": "lm"
-      },
-      "title": {
-        "en": "Light",
-        "nl": "Licht"
-      },
-    "getable": true,
-    "setable": false
-  }
-},
   "permissions": [],
   "images": {
     "large": "/assets/images/large.png",
@@ -98,34 +83,5 @@
         "template": "add_devices"
       }
     ]
-    },
-    {
-      "id": "sensor",
-      "name": {
-        "en": "Sensor"
-      },
-      "class": "sensor",
-      "capabilities": [
-        "boolean_capability"
-      ],
-      "images": {
-        "large": "/drivers/sensor/assets/images/large.png",
-        "small": "/drivers/sensor/assets/images/small.png"
-      },
-      "pair": [{
-          "id": "list_devices",
-          "template": "list_devices",
-          "navigation": {
-            "next": "add_devices"
-          },
-          "options": {
-            "singular": false
-          }
-        },
-        {
-          "id": "add_devices",
-          "template": "add_devices"
-        }
-      ]
-      }]
+    }]
 }
