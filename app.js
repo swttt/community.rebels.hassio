@@ -1,9 +1,9 @@
 'use strict';
 
 // SETTINGS
-const IP = "192.168.2.20"
+const IP = "192.168.178.38"
 const PORT = "8123"
-const PASSWORD = "Password"
+const PASSWORD = ""
 
 // LIBS
 const Homey = require( 'homey' );
@@ -26,8 +26,11 @@ var es = new EventSource( url, config );
 // REST
 const http = axios.create( {
   baseURL: 'http://' + IP + ':' + PORT + '/api/',
-  timeout: 1000,
-  config
+  timeout: 10000,
+  headers: {
+    'x-ha-access': PASSWORD,
+    'Content-Type': 'application/json'
+  }
 } );
 
 class HassIO extends Homey.App {
@@ -85,7 +88,7 @@ class HassIO extends Homey.App {
     es.onopen = function () {
       console.log( "Connection to server opened." );
     };
-		
+
     es.onmessage = ( msg ) => {
       if ( msg.data !== "ping" ) {
         let data = JSON.parse( msg.data );
