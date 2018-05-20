@@ -2,8 +2,6 @@
 
 const Homey = require( 'homey' );
 
-const merge = require( 'deepmerge');
-
 const features = {
   "alarm_smoke": 'smoke',
   "alarm_heat": 'heat',
@@ -55,22 +53,18 @@ class SensorDriver extends Homey.Driver {
                 device.data['id_' + feature] = data[ key ].entity_id;
                 device.data['attributes_' + feature] = data[ key ].attributes;
 
-                this.log('DEVICE DATA: ', JSON.stringify(device));
+                //this.log('DEVICE DATA: ', JSON.stringify(device));
 
                 devices.push( device );
-
-                //CHECK IF DEVICE.NAME IS FOUND IN DEVICES
-                //IF SO, MERGE DEVICE WITH DEVICES[FOUND] AND PUSH TO DEVICES
-                //ELSE PUSH DEVICE TO DEVICES
 
               }
             }
           }
           // console.log('\n================ devices:\n', devices);
-          this.log('DEVICES DATA: ', JSON.stringify(devices));
+          //this.log('DEVICES DATA: ', JSON.stringify(devices));
 
         })
-        console.log( '\n\nMERGED DEVICES: ', mergeDevices(devices) );
+        //console.log( '\n\nMERGED DEVICES: ', mergeDevices(devices) );
 
         callback( null, mergeDevices(devices) );
 
