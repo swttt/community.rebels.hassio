@@ -2,14 +2,18 @@
 
 const Homey = require( 'homey' );
 
+const merge = require( 'deepmerge');
+
 const features = {
-  "alarm_smoke": '_sensor_smoke',
-  "alarm_heat": '_sensor_heat',
-  "alarm_tamper": '_sensor_burglar',
+  "alarm_smoke": 'smoke',
+  "alarm_heat": 'heat',
+  "alarm_tamper": 'burglar',
   "measure_temperature": 'temperature',
   "measure_humidity": 'humidity',
   "measure_pressure": 'pressure',
   "measure_battery": 'battery_level',
+  "alarm_contact": 'openclose',
+  "alarm_motion": 'motion'
 };
 
 class SensorDriver extends Homey.Driver {
@@ -21,6 +25,7 @@ class SensorDriver extends Homey.Driver {
   onPairListDevices( data, callback ) {
 
     let devices = [];
+    let devices_grouped = [];
 
     Homey.app.getStates()
       .then( data => {
@@ -31,31 +36,48 @@ class SensorDriver extends Homey.Driver {
           this.log(data[ key ].attributes);
 
           this.log('========================================');
+          for ( var feature in features ) {
+            if ( data[ key ].entity_id.startsWith( 'sensor.' ) ) {
 
-          if ( data[ key ].entity_id.startsWith( 'sensor.' ) ) {
+              if ( ( data[ key ].entity_id.endsWith(features[ feature ]) ) || ( data[ key ].attributes.supported_features & features[ feature ] ) ) {
 
-            let device = {
-              //"name": data[ key ].attributes.friendly_name,
-              "name": data[ key ].entity_id,
-              "capabilities": [],
-              "data": {
-                "attributes": data[ key ].attributes
-              }
-            }
-            for ( var feature in features ) {
-              if ( data[ key ].entity_id.includes(features[ feature ]) ) {
-                this.log('FEATURES[FEATURE]', features[ feature ])
+                let device = {
+                  //"name": data[ key ].attributes.friendly_name,
+                  "name": data[ key ].entity_id,
+                  "capabilities": [],
+                  "data": {
+                    "attributes": data[ key ].attributes,
+                  }
+                }
+
+                console.log('FEATURES[FEATURE]', features[ feature ])
                 device.capabilities.push( feature );
                 device.data['id_' + feature] = data[ key ].entity_id;
+                device.data['attributes_' + feature] = data[ key ].attributes;
+                //if ( devices.toString() === '' ) {
+                devices.push( device );
+                //devices = merge( devices, device );
+                //console.log('\n********************* devices_grouped:\n', devices);
+                //}
+                //else {
+
+                //CHECK IF DEVICE.NAME IS FOUND IN DEVICES
+                //IF SO, MERGE DEVICE WITH DEVICES[FOUND] AND PUSH TO DEVICES
+                //ELSE PUSH DEVICE TO DEVICES
+
+                  //devices.push( device );
+                  //devices = merge( device, devices );
+                  //console.log('\n********************* devices_grouped:\n', devices);
+                  //}
               }
             }
-            devices.push( device )
           }
+          console.log('\n================ devices:\n', devices);
 
-
-        this.log('================ devices: ', devices);
         })
+
         callback( null, devices );
+        
       } );
 
   }

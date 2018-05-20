@@ -2,6 +2,18 @@
 
 const Homey = require( 'homey' );
 
+const capability_type = {
+  "alarm_smoke": 'boolean',
+  "alarm_heat": 'boolean',
+  "alarm_tamper": 'binary',
+  "measure_temperature": 'floatvalue',
+  "measure_humidity": 'intvalue',
+  "measure_pressure": 'intvalue',
+  "measure_battery": 'intvalue',
+  "alarm_contact": 'boolean',
+  "alarm_motion": 'boolean'
+};
+
 const EventBus = require( 'eventbusjs' );
 
 class SensorDevice extends Homey.Device {
@@ -13,7 +25,7 @@ class SensorDevice extends Homey.Device {
 
     //LOOP THROUGH CAPABILITIES
     Object.keys( device_capability ).forEach( ( key ) => {
-      this.log(device_capability[ key ]);
+      console.log(device_capability[ key ]);
 
       // SET CAPABILITIES ON INIT
       const capability = device_capability[ key ].toString();
@@ -29,7 +41,7 @@ class SensorDevice extends Homey.Device {
 
       // ADD EVENT LISTENER
       EventBus.addEventListener( eval(`this.getData().id_${capability}`), ( data ) => {
-        console.log( data.target.entity_id + ' got an update!' );
+        this.log( data.target.entity_id + ' got an update!' );
         console.log( data.target.new_state.attributes );
         console.log(data.state);
         this.setAllCapabilities( data.target.new_state, capability );
@@ -39,55 +51,45 @@ class SensorDevice extends Homey.Device {
 
   setAllCapabilities( data, capability ) {
 
-    //TEMPERATURE
-    this.log('LOG data: ', data);
-    this.log('CAPABILITY: ', capability);
-    this.log('data.state: ', data.state);
+    //SET CAPABILITY
+    console.log('LOG data: ', data);
+    console.log('CAPABILITY: ', capability);
+    console.log('data.state: ', data.state);
 
-    if ( capability === 'measure_temperature' ) {
-      this.log('value changed');
-      this.setCapabilityValue( capability, parseFloat(data.state, 10) );
-    }
-    if ( capability === 'measure_humidity' ) {
-      this.log('value changed');
-      this.setCapabilityValue( capability, parseFloat(data.state, 10) );
-    }
-    if ( capability === 'measure_pressure' ) {
-      this.log('value changed');
-      this.setCapabilityValue( capability, parseInt(data.state, 10) );
-    }
-    if ( capability === 'measure_battery' ) {
-      this.log('value changed');
-      this.setCapabilityValue( capability, parseInt(data.state, 10) );
-    }
-    if ( capability === 'alarm_smoke' ) {
-      if ( parseInt(data.state) === 0 ) {
-        this.log('value changed');
-        this.setCapabilityValue( capability, false );
-      }
-      if ( parseInt(data.state) === 1 ) {
-        this.log('value changed');
-        this.setCapabilityValue( capability, true );
-      }
-    }
-    if ( capability === 'alarm_heat' ) {
-      if ( parseInt(data.state) === 0 ) {
-        this.log('value changed');
-        this.setCapabilityValue( capability, false );
-      }
-      if ( parseInt(data.state) === 1 ) {
-        this.log('value changed');
-        this.setCapabilityValue( capability, true );
-      }
-    }
-    if ( capability === 'alarm_tamper' ) {
-      if ( parseInt(data.state) === 0 ) {
-        this.log('value changed');
-        this.setCapabilityValue( capability, false );
-      }
-      if ( parseInt(data.state) === 254 ) {
-        this.log('value changed');
-        this.setCapabilityValue( capability, true );
+    for ( var type in capability_type ) {
+
+      if ( capability === type ) {
+
+        switch(capability_type[type]) {
+          case "floatvalue":
+            this.log(`${capability_type[type]} value changed for `, capability);
+            this.setCapabilityValue( capability, parseFloat(data.state, 10) );
+            break;
+          case "intvalue":
+            this.log(`${capability_type[type]} value changed for `, capability);
+            this.setCapabilityValue( capability, parseInt(data.state, 10) );
+            break;
+          case "binary":
+            this.log(`${capability_type[type]} value changed for `, capability);
+            if ( parseInt(data.state) === 0 ) {
+              this.setCapabilityValue( capability, false );
+            }
+            if ( parseInt(data.state) === 254 ) {
+              this.setCapabilityValue( capability, true );
+            }
+            break;
+          case "boolean":
+            this.log(`${capability_type[type]} value changed for `, capability);
+            if ( parseInt(data.state) === 0 ) {
+              this.setCapabilityValue( capability, false );
+            }
+            if ( parseInt(data.state) === 1 ) {
+              this.setCapabilityValue( capability, true );
+            }
+            break;
+          default:
+            this.log('Type not defined for ', capability);
+        }
       }
     }
 
