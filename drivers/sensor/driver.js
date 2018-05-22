@@ -37,7 +37,7 @@ class SensorDriver extends Homey.Driver {
           for ( var feature in features ) {
             if ( data[ key ].entity_id.startsWith( 'sensor.' ) ) {
 
-              if ( ( data[ key ].entity_id.endsWith(features[ feature ]) ) || ( data[ key ].attributes.supported_features & features[ feature ] ) ) {
+              if ( ( data[ key ].entity_id.endsWith(features[ feature ]) ) || ( data[ key ].attributes.device_classes & features[ feature ] ) ) {
 
                 let device = {
                   "name": data[ key ].attributes.friendly_name,
