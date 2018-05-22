@@ -64,7 +64,7 @@ class SensorDriver extends Homey.Driver {
           //this.log('DEVICES DATA: ', JSON.stringify(devices));
 
         })
-        //console.log( '\n\nMERGED DEVICES: ', mergeDevices(devices) );
+        console.log( '\n\nMERGED DEVICES: ', mergeDevices(devices) );
 
         callback( null, mergeDevices(devices) );
 
@@ -73,10 +73,7 @@ class SensorDriver extends Homey.Driver {
       function mergeDevices(devices) {
         let data = devices.reduce((acc, device) => {
           let item = acc[device.name];
-          let item2 = acc[device.capabilities];
-          //console.log('\n\n Item: ',item);
-          //console.log('\nItem2: ',item2);
-          if ((! item) & (! item2)) {
+          if (! item) {
             acc[device.name] = item = {
               name         : device.name,
               capabilities : [],

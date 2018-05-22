@@ -11,7 +11,8 @@ const capability_type = {
   "measure_pressure": 'intvalue',
   "measure_battery": 'intvalue',
   "alarm_contact": 'boolean',
-  "alarm_motion": 'boolean'
+  "alarm_motion": 'boolean',
+  "alarm_generic": 'switch'
 };
 
 const EventBus = require( 'eventbusjs' );
@@ -85,6 +86,15 @@ class SensorDevice extends Homey.Device {
             }
             if ( parseInt(data.state) === 1 ) {
               this.setCapabilityValue( capability, true );
+            }
+            break;
+          case "switch":
+            this.log(`${capability_type[type]} value changed for `, capability);
+            if ( data.state === 'on' ) {
+              this.setCapabilityValue( capability, true )
+            }
+            else {
+              this.setCapabilityValue( capability, false )
             }
             break;
           default:
