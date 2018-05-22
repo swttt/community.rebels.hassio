@@ -37,7 +37,7 @@ class SensorDriver extends Homey.Driver {
           for ( var feature in features ) {
             if ( data[ key ].entity_id.startsWith( 'sensor.' ) ) {
 
-              if ( ( data[ key ].entity_id.endsWith(features[ feature ]) ) || ( data[ key ].attributes.device_classes & features[ feature ] ) ) {
+              if ( ( data[ key ].entity_id.endsWith(features[ feature ]) ) || ( data[ key ].attributes.device_class === features[ feature ] ) ) {
 
                 let device = {
                   "name": data[ key ].attributes.friendly_name,
@@ -73,7 +73,10 @@ class SensorDriver extends Homey.Driver {
       function mergeDevices(devices) {
         let data = devices.reduce((acc, device) => {
           let item = acc[device.name];
-          if (! item) {
+          let item2 = acc[device.capabilities];
+          //console.log('\n\n Item: ',item);
+          //console.log('\nItem2: ',item2);
+          if ((! item) & (! item2)) {
             acc[device.name] = item = {
               name         : device.name,
               capabilities : [],
