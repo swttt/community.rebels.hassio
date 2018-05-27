@@ -11,7 +11,10 @@ const features = {
   "measure_pressure": 'pressure',
   "measure_battery": 'battery_level',
   "alarm_contact": 'openclose',
-  "alarm_motion": 'motion'
+  "alarm_motion": 'motion',
+  "alarm_generic": 'sensor',
+  "measure_power": 'power',
+  "meter_power": 'energy'
 };
 
 class SensorDriver extends Homey.Driver {
@@ -32,29 +35,26 @@ class SensorDriver extends Homey.Driver {
 
           this.log('========================================');
           this.log(data[ key ].attributes);
+          console.log('Original ENTITY-ID :', data[ key ].entity_id);
+          let entityEndStripped = data[ key ].entity_id.replace(/_[1-9]/g, '');
+
+          console.log('ENTITY-ID without number: ', entityEndStripped );
 
           this.log('========================================');
           for ( var feature in features ) {
-            if ( data[ key ].entity_id.startsWith( 'sensor.' ) ) {
+            if ( ( entityEndStripped.startsWith( 'sensor.' ) ) || ( entityEndStripped.startsWith( 'binary_sensor.' ) ) ) {
 
-              if ( ( data[ key ].entity_id.endsWith(features[ feature ]) ) || ( data[ key ].attributes.device_class === features[ feature ] ) ) {
+              if ( ( entityEndStripped.endsWith(features[ feature ]) ) || ( data[ key ].attributes.device_class === features[ feature ] ) ) {
 
                 let device = {
                   "name": data[ key ].attributes.friendly_name,
                   //"name": data[ key ].entity_id,
                   "capabilities": [],
-                  "data": {
-                    "attributes": [],
-                  }
+                  "data": [],
                 }
 
-                console.log('FEATURES[FEATURE]', features[ feature ])
                 device.capabilities.push( feature );
-                device.data['id_' + feature] = data[ key ].entity_id;
-                device.data['attributes_' + feature] = data[ key ].attributes;
-
-                //this.log('DEVICE DATA: ', JSON.stringify(device));
-
+                device.data[feature] = data[ key ].entity_id;
                 devices.push( device );
 
               }
@@ -64,7 +64,9 @@ class SensorDriver extends Homey.Driver {
           //this.log('DEVICES DATA: ', JSON.stringify(devices));
 
         })
-        console.log( '\n\nMERGED DEVICES: ', mergeDevices(devices) );
+        console.log(mergeDevices(devices));
+
+        console.log( '\n\nMERGED DEVICES: ', JSON.stringify(mergeDevices(devices) ));
 
         callback( null, mergeDevices(devices) );
 
@@ -77,12 +79,20 @@ class SensorDriver extends Homey.Driver {
             acc[device.name] = item = {
               name         : device.name,
               capabilities : [],
-              data         : { attributes : {} },
+              data         : [],
             };
           }
-          item.capabilities.push(...device.capabilities);
-          item.data.attributes = Object.assign({}, item.data.attributes, device.data.attributes);
-          delete device.data.attributes;
+          for (let cap of device.capabilities) {
+            let idx    = 1;
+            let newCap = cap;
+            while (item.capabilities.includes(newCap)) {
+              newCap = cap + '.' + idx++;
+              console.log('----------DUPLICAT CAPABILITY FOUND----------');
+              console.log(newCap);
+              Object.defineProperty(item.data, newCap, Object.getOwnPropertyDescriptor(item.data, cap));
+            }
+            item.capabilities.push(newCap);
+          }
           item.data = Object.assign({}, item.data, device.data);
           return acc;
         }, {});

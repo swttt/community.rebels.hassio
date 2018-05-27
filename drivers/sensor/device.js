@@ -3,8 +3,8 @@
 const Homey = require( 'homey' );
 
 const capability_type = {
-  "alarm_smoke": 'boolean',
-  "alarm_heat": 'boolean',
+  "alarm_smoke": 'binary',
+  "alarm_heat": 'binary',
   "alarm_tamper": 'binary',
   "measure_temperature": 'floatvalue',
   "measure_humidity": 'intvalue',
@@ -12,7 +12,9 @@ const capability_type = {
   "measure_battery": 'intvalue',
   "alarm_contact": 'boolean',
   "alarm_motion": 'boolean',
-  "alarm_generic": 'switch'
+  "alarm_generic": 'switch',
+  "measure_power": 'floatvalue',
+  "meter_power": 'floatvalue'
 };
 
 const EventBus = require( 'eventbusjs' );
@@ -30,9 +32,9 @@ class SensorDevice extends Homey.Device {
 
       // SET CAPABILITIES ON INIT
       const capability = device_capability[ key ].toString();
-      Homey.app.getState( eval(`this.getData().id_${capability}`) )
+      Homey.app.getState( eval(`this.getData()['${capability}']`) )
       .then( ( res ) => {
-        this.log( 'DEVICE INIT - ' + eval(`this.getData().id_${capability}`) );
+        this.log( 'DEVICE INIT - ' + eval(`this.getData()['${capability}']`) );
         this.log('NOW EXECUTING SETALLCAPABILITIES');
         this.setAllCapabilities( res, capability );
       } )
@@ -41,7 +43,7 @@ class SensorDevice extends Homey.Device {
       } );
 
       // ADD EVENT LISTENER
-      EventBus.addEventListener( eval(`this.getData().id_${capability}`), ( data ) => {
+      EventBus.addEventListener( eval(`this.getData()['${capability}']`), ( data ) => {
         this.log( data.target.entity_id + ' got an update!' );
         console.log( data.target.new_state.attributes );
         console.log(data.state);
@@ -56,10 +58,11 @@ class SensorDevice extends Homey.Device {
     console.log('LOG data: ', data);
     console.log('CAPABILITY: ', capability);
     console.log('data.state: ', data.state);
-
+    let capabilityEndStripped = capability.replace(/.[1-9]/g, '');
+    console.log('CAPABILITY END STRIPPED: ', capabilityEndStripped);
     for ( var type in capability_type ) {
 
-      if ( capability === type ) {
+      if ( capabilityEndStripped === type ) {
 
         switch(capability_type[type]) {
           case "floatvalue":
