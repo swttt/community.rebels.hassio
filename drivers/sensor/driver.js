@@ -44,17 +44,30 @@ class SensorDriver extends Homey.Driver {
           for ( var feature in features ) {
             if ( ( entityEndStripped.startsWith( 'sensor.' ) ) || ( entityEndStripped.startsWith( 'binary_sensor.' ) ) ) {
 
-              if ( ( entityEndStripped.endsWith(features[ feature ]) ) || ( data[ key ].attributes.device_class === features[ feature ] ) ) {
+              if ( ( entityEndStripped.endsWith(features[ feature ]) ) || ( data[ key ].attributes.device_class & features[ feature ] ) ) {
+
+                let device_name;
+                if ( data[ key ].attributes.homey_device ) {
+                  device_name = data[ key ].attributes.homey_device;
+                }
+                else {
+                  device_name = data[ key ].attributes.friendly_name;
+                }
 
                 let device = {
-                  "name": data[ key ].attributes.friendly_name,
+                  "name": device_name,
+                  //"name": data[ key ].attributes.homey_device,
                   //"name": data[ key ].entity_id,
                   "capabilities": [],
+                  "capabilitiesOptions": [],
                   "data": [],
                 }
 
                 device.capabilities.push( feature );
                 device.data[feature] = data[ key ].entity_id;
+                device.capabilitiesOptions[feature] = 'title: testje';
+                console.log('\n================ device:\n', device);
+                this.log('DEVICES DATA: ', JSON.stringify(device));
                 devices.push( device );
 
               }
@@ -69,6 +82,8 @@ class SensorDriver extends Homey.Driver {
         console.log( '\n\nMERGED DEVICES: ', JSON.stringify(mergeDevices(devices) ));
 
         callback( null, mergeDevices(devices) );
+        //console.log(devices);
+        //callback( null, devices );
 
       } );
 
@@ -79,6 +94,7 @@ class SensorDriver extends Homey.Driver {
             acc[device.name] = item = {
               name         : device.name,
               capabilities : [],
+              capabilitiesOptions: {},
               data         : [],
             };
           }
@@ -94,6 +110,7 @@ class SensorDriver extends Homey.Driver {
             item.capabilities.push(newCap);
           }
           item.data = Object.assign({}, item.data, device.data);
+          item.capabilitiesOptions = Object.assign({}, item.capabilitiesOptions, device.capabilitiesOptions);
           return acc;
         }, {});
         return Object.values(data);
