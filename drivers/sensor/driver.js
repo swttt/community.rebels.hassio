@@ -3,6 +3,7 @@
 const Homey = require( 'homey' );
 
 const features = {
+  "alarm_water": 'moisture',
   "alarm_smoke": 'smoke',
   "alarm_heat": 'heat',
   "alarm_tamper": 'burglar',
@@ -44,7 +45,11 @@ class SensorDriver extends Homey.Driver {
           for ( var feature in features ) {
             if ( ( entityEndStripped.startsWith( 'sensor.' ) ) || ( entityEndStripped.startsWith( 'binary_sensor.' ) ) ) {
 
-              if ( ( entityEndStripped.endsWith(features[ feature ]) ) || ( data[ key ].attributes.device_class & features[ feature ] ) ) {
+              if ( ( entityEndStripped.endsWith(features[ feature ]) ) || ( data[ key ].attributes.device_class === features[ feature ] ) ) {
+
+                if ( data[ key ].attributes.homey_capability ) {
+                  console.log('**********' + data[ key ].attributes.homey_capability + '*********');
+                }
 
                 let device_name;
                 if ( data[ key ].attributes.homey_device ) {

@@ -14,7 +14,8 @@ const capability_type = {
   "alarm_motion": 'switch',
   "alarm_generic": 'switch',
   "measure_power": 'floatvalue',
-  "meter_power": 'floatvalue'
+  "meter_power": 'floatvalue',
+  "alarm_water": 'switch'
 };
 
 const EventBus = require( 'eventbusjs' );
