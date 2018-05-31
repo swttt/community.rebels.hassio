@@ -11,7 +11,7 @@ const capability_type = {
   "measure_pressure": 'intvalue',
   "measure_battery": 'intvalue',
   "alarm_contact": 'boolean',
-  "alarm_motion": 'boolean',
+  "alarm_motion": 'switch',
   "alarm_generic": 'switch',
   "measure_power": 'floatvalue',
   "meter_power": 'floatvalue'
