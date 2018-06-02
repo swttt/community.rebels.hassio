@@ -28,7 +28,6 @@ class SensorDriver extends Homey.Driver {
 
     let devices = [];
     let devices_grouped = [];
-    let custom_title = false;
 
     Homey.app.getStates()
       .then( data => {
@@ -60,27 +59,16 @@ class SensorDriver extends Homey.Driver {
                   device_name = data[ key ].attributes.friendly_name;
                 }
 
-                let capability_title;
-                if ( data[ key ].attributes.homey_title ) {
-                  custom_title = true;
-                  capability_title = data[ key ].attributes.homey_title;
-                }
-                else {
-                  custom_title = false;
-                  let title = feature.split(/_/);
-                  capability_title = capitalize(title[1]);
-                  if ( feature.startsWith( 'alarm' ) ) capability_title = capitalize(title[1]) + ' Alarm';
-                }
-
                 let device = {
                   "name": device_name,
                   "capabilities": [],
-                  "capabilitiesOptions": JSON.parse(`{"${feature}":{"title":"${capability_title}"}}`),
-                  "data": [],
+                  "capabilitiesOptions": JSON.parse(`{"${feature}":{"title":"${setDeviceTitle( data[ key ].attributes.homey_title, feature )}"}}`),
+                  "data": []
                 }
 
                 device.capabilities.push( feature );
                 device.data[feature] = data[ key ].entity_id;
+                device.data[feature + '_title'] = setDeviceTitle( data[ key ].attributes.homey_title, feature );
                 devices.push( device );
 
               }
@@ -92,7 +80,7 @@ class SensorDriver extends Homey.Driver {
         })
         console.log(mergeDevices(devices));
 
-        //console.log( '\n\nMERGED DEVICES: ', JSON.stringify(mergeDevices(devices) ));
+        console.log( '\n\nMERGED DEVICES: ', JSON.stringify(mergeDevices(devices) ));
 
         callback( null, mergeDevices(devices) );
         //console.log(devices);
@@ -117,12 +105,8 @@ class SensorDriver extends Homey.Driver {
             while (item.capabilities.includes(newCap)) {
               newCap = cap + '.' + idx++;
               Object.defineProperty(item.data, newCap, Object.getOwnPropertyDescriptor(item.data, cap));
-              //if ( !custom_title ) {
-                let newTitle = newCap.split(/_/);
-                let capability_title = capitalize(newTitle[1]);
-                if ( newCap.startsWith( 'alarm' ) ) capability_title = capitalize(newTitle[1]) + ' Alarm';
-                item.capabilitiesOptions = JSON.parse(`{"${newCap}":{"title":"${capability_title}"}}`);
-              //}
+              console.log('############ ' + JSON.stringify(item.data[cap + '_title']) + '############');
+              item.capabilitiesOptions = JSON.parse(`{"${newCap}":{"title":"${setDeviceTitle( item.data[cap + '_title'], newCap )}"}}`);
             }
             item.capabilities.push(newCap);
           }
@@ -131,6 +115,19 @@ class SensorDriver extends Homey.Driver {
           return acc;
         }, {});
         return Object.values(data);
+      }
+
+      function setDeviceTitle( hass_title, capfeature ) {
+        let capability_title;
+        if ( hass_title ) {
+          capability_title = hass_title;
+        }
+        else {
+          let title = capfeature.split(/_/);
+          capability_title = capitalize(title[1]);
+          if ( capfeature.startsWith( 'alarm' ) ) capability_title = capitalize(title[1]) + ' Alarm';
+        }
+        return capability_title;
       }
 
       function capitalize(s) {
