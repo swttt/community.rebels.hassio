@@ -17,3 +17,7 @@ sensor.fibaro_system_fgss101_smoke_sensor_heat:
 binary_sensor.fibaro_system_fgsd002_smoke_sensor_sensor:
   homey_device: 'DEVICE NAME FOR DEVICE WITH GROUPED CAPABILITIES'
   homey_title: 'Smoke Sensor Status'
+
+# Version 1.0.1
+
+Added icon's for sensors and fixed measure_battery for deconz devices

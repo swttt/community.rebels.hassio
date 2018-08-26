@@ -15,7 +15,8 @@ const capability_type = {
   "alarm_generic": 'switch',
   "measure_power": 'floatvalue',
   "meter_power": 'floatvalue',
-  "alarm_water": 'switch'
+  "alarm_water": 'switch',
+  "measure_luminance": 'intvalue'
 };
 
 const EventBus = require( 'eventbusjs' );
@@ -59,54 +60,65 @@ class SensorDevice extends Homey.Device {
     console.log('LOG data: ', data);
     console.log('CAPABILITY: ', capability);
     console.log('data.state: ', data.state);
+    console.log('data.attributes.battery_level: ', data.attributes.battery_level);
+    console.log('batteryleveltype: ', typeof data.attributes.battery_level == "number");
     let capabilityEndStripped = capability.replace(/.[1-9]/g, '');
     console.log('CAPABILITY END STRIPPED: ', capabilityEndStripped);
     for ( var type in capability_type ) {
 
-      if ( capabilityEndStripped === type ) {
+      if ( (capabilityEndStripped === type) && (capabilityEndStripped !== 'measure_battery') ) {
 
-        switch(capability_type[type]) {
-          case "floatvalue":
-            this.log(`${capability_type[type]} value changed for `, capability);
-            this.setCapabilityValue( capability, parseFloat(data.state, 10) );
-            break;
-          case "intvalue":
-            this.log(`${capability_type[type]} value changed for `, capability);
-            this.setCapabilityValue( capability, parseInt(data.state, 10) );
-            break;
-          case "binary":
-            this.log(`${capability_type[type]} value changed for `, capability);
-            if ( parseInt(data.state) === 0 ) {
-              this.setCapabilityValue( capability, false );
-            }
-            if ( parseInt(data.state) === 254 ) {
-              this.setCapabilityValue( capability, true );
-            }
-            break;
-          case "boolean":
-            this.log(`${capability_type[type]} value changed for `, capability);
-            if ( parseInt(data.state) === 0 ) {
-              this.setCapabilityValue( capability, false );
-            }
-            if ( parseInt(data.state) === 1 ) {
-              this.setCapabilityValue( capability, true );
-            }
-            break;
-          case "switch":
-            this.log(`${capability_type[type]} value changed for `, capability);
-            if ( data.state === 'on' ) {
-              this.setCapabilityValue( capability, true )
-            }
-            else {
-              this.setCapabilityValue( capability, false )
-            }
-            break;
-          default:
-            this.log('Type not defined for ', capability);
-        }
+          switch( capability_type[type] ) {
+            case "floatvalue":
+              this.log(`${capability_type[type]} value changed for `, capability);
+              this.setCapabilityValue( capability, parseFloat(data.state, 10) );
+              break;
+            case "intvalue":
+              this.log(`${capability_type[type]} value changed for `, capability);
+              this.setCapabilityValue( capability, parseInt(data.state, 10) );
+              break;
+            case "binary":
+              this.log(`${capability_type[type]} value changed for `, capability);
+              if ( parseInt(data.state) === 0 ) {
+                this.setCapabilityValue( capability, false );
+              }
+              if ( parseInt(data.state) === 254 ) {
+                this.setCapabilityValue( capability, true );
+              }
+              break;
+            case "boolean":
+              this.log(`${capability_type[type]} value changed for `, capability);
+              if ( parseInt(data.state) === 0 ) {
+                this.setCapabilityValue( capability, false );
+              }
+              if ( parseInt(data.state) === 1 ) {
+                this.setCapabilityValue( capability, true );
+              }
+              break;
+            case "switch":
+              this.log(`${capability_type[type]} value changed for `, capability);
+              if ( data.state === 'on' ) {
+                this.setCapabilityValue( capability, true )
+              }
+              else {
+                this.setCapabilityValue( capability, false )
+              }
+              break;
+            default:
+              this.log('Type not defined for ', capability);
+          }
       }
     }
-
+    if (capabilityEndStripped === 'measure_battery') {
+        if (typeof data.attributes.battery_level == "number") {
+          this.log('battery_level changed for ', capability);
+          this.setCapabilityValue( capability, parseInt(data.attributes.battery_level, 10) );
+        }
+        else {
+          this.log(`${capability_type[type]} value changed for `, capability);
+          this.setCapabilityValue( capability, parseInt(data.state, 10) );
+        }
+    }
   }
 
 }
