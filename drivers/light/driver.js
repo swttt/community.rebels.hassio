@@ -26,6 +26,8 @@ class LightDriver extends Homey.Driver {
       .then( data => {
         // var data = result.data
         Object.keys( data ).forEach( ( key ) => {
+          this.log('========================================');
+          this.log(data[ key ].attributes);
           if ( data[ key ].entity_id.startsWith( 'light.' ) ) {
             let device = {
               "name": data[ key ].attributes.friendly_name,

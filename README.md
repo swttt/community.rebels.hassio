@@ -20,4 +20,8 @@ binary_sensor.fibaro_system_fgsd002_smoke_sensor_sensor:
 
 # Version 1.0.1
 
-Added icon's for sensors and fixed measure_battery for deconz devices
+Added icon's for sensors and fixed measure_battery for Deconz devices
+
+# Version 1.0.2
+
+Added measure_power and meter_power for Deconz devices

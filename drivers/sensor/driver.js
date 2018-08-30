@@ -17,7 +17,8 @@ const features = {
   "alarm_motion": 'motion',
   "alarm_generic": 'sensor',
   "measure_power": 'power',
-  "meter_power": 'energy'
+  "meter_power": 'energy',
+  "meter_power": 'consumption'
 };
 
 class SensorDriver extends Homey.Driver {
@@ -39,8 +40,11 @@ class SensorDriver extends Homey.Driver {
           this.log('========================================');
           this.log(data[ key ].attributes);
           console.log('Original ENTITY-ID :', data[ key ].entity_id);
-          let entityEndStripped = data[ key ].entity_id.replace(/_[1-9]/g, '');
-
+          let entityEndStripped = data[ key ].entity_id.replace(/_[1-9][0-9]/, '');
+          let unitOffmeasurement = '';
+          if ( data[ key ].attributes.unit_of_measurement ) {
+            let unitOffmeasurement = data[ key ].attributes.unit_of_measurement.toString();
+          }
           console.log('ENTITY-ID without number: ', entityEndStripped );
 
           this.log('========================================');
@@ -59,7 +63,7 @@ class SensorDriver extends Homey.Driver {
                 }
 
                 let iconlocation = feature + '.svg';
-                console.log(`\n DEVICE ICON: `, iconlocation);
+                // console.log(`\n DEVICE ICON: `, iconlocation);
 
                 let device = {
                   "name": device_name,
@@ -73,26 +77,35 @@ class SensorDriver extends Homey.Driver {
                 device.data[feature] = data[ key ].entity_id;
                 device.data[feature + '_title'] = setDeviceTitle( data[ key ].attributes.homey_title, feature );
 
-                //LOG data:  { entity_id: 'sensor.lightlevel_5',
-                //state: '25.1',
-                //attributes:
-                //{ battery_level: 100,
-                //on: true,
-                //dark: false,
-                //unit_of_measurement: 'lux',
-                //friendly_name: 'Philips Woonkamer',
-                //device_class: 'lux',
-                //homey_device: 'Philips Woonkamer',
-                //homey_capability: 'measure_luminance' },
-                //last_changed: '2018-08-25T15:55:54.232701+00:00',
-                //last_updated: '2018-08-25T15:55:54.232701+00:00',
-                //context: { id: '105c962a730f48f29efe99807872e7f0', user_id: null } }
-                //CAPABILITY:  measure_luminance
-                //data.state:  25.1
-
                 if ( data[ key ].attributes.battery_level ) {
                       device.capabilities.push( 'measure_battery' );
                       device.data['measure_battery'] = data[ key ].entity_id;
+                }
+
+                /*LOG data:  { entity_id: 'sensor.power_17',
+                  state: '0',
+                  attributes:
+                   { on: true,
+                     current: 0,
+                     voltage: 235,
+                     unit_of_measurement: 'Watts',
+                     friendly_name: 'Power 17',
+                     homey_device: 'Ubisys bijkeuken',
+                     homey_capability: 'measure_power' },
+                  last_changed: '2018-08-30T18:54:42.471812+00:00',
+                  last_updated: '2018-08-30T18:54:42.471812+00:00',
+                  context: { id: '151f201ab8ab4842bd60e8a274c44eae', user_id: null } } */
+
+                console.log('/n UNIT OF MEASUREMENT: ', unitOffmeasurement);
+
+                if ( unitOffmeasurement.endsWith('kWh') ) {
+                      device.capabilities.push( 'measure_power' );
+                      device.data['measure_power'] = data[ key ].entity_id;
+                }
+
+                if ( unitOffmeasurement.endsWith('Watts') ) {
+                    device.capabilities.push( 'meter_power' );
+                    device.data['meter_power'] = data[ key ].entity_id;
                 }
 
                 devices.push( device );
@@ -101,13 +114,11 @@ class SensorDriver extends Homey.Driver {
             }
           }
 
-          console.log('\n================ devices:\n', devices);
-          this.log('DEVICES DATA: ', JSON.stringify(devices));
+          // console.log('\n================ devices:\n', devices);
+          // this.log('DEVICES DATA: ', JSON.stringify(devices));
 
         })
-        //console.log(mergeDevices(devices));
-
-        //console.log( '\n\nMERGED DEVICES: ', JSON.stringify(mergeDevices(devices) ));
+        // console.log(mergeDevices(devices));
 
         callback( null, mergeDevices(devices) );
         //console.log(devices);
@@ -133,7 +144,7 @@ class SensorDriver extends Homey.Driver {
             while ( ( item.capabilities.includes(newCap) ) && ( !item.capabilities.includes('measure_battery') )) {
               newCap = cap + '.' + idx++;
               Object.defineProperty(item.data, newCap, Object.getOwnPropertyDescriptor(item.data, cap));
-              console.log('############ ' + JSON.stringify(item.data[cap + '_title']) + '############');
+              // console.log('############ ' + JSON.stringify(item.data[cap + '_title']) + '############');
               item.capabilitiesOptions = JSON.parse(`{"${newCap}":{"title":"${setDeviceTitle( item.data[cap + '_title'], newCap )}"}}`);
             }
             item.capabilities.push(newCap);
