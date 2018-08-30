@@ -6,7 +6,7 @@ This version uses friendly_name to group Hass sensors into one devices
 
 Therefore use customize.yaml and custom attribute homey_device
 
-In addition you can set the capability title by defining homey_title (not working yet for multiple identical capabilities)
+In addition you can set the capability title by defining homey_title
 
 Example:
 
