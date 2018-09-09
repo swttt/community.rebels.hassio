@@ -25,3 +25,8 @@ Added icon's for sensors and fixed measure_battery for Deconz devices
 # Version 1.0.2
 
 Added measure_power and meter_power for Deconz devices
+
+# Version 1.0.3
+
+Added settings page (not final yet)
+Username not implemented yet

@@ -18,7 +18,8 @@ const features = {
   "alarm_generic": 'sensor',
   "measure_power": 'power',
   "meter_power": 'energy',
-  "meter_power": 'consumption'
+  "meter_power": 'consumption',
+  "phone_docked": 'battery_state'
 };
 
 class SensorDriver extends Homey.Driver {
@@ -63,7 +64,7 @@ class SensorDriver extends Homey.Driver {
                 }
 
                 let iconlocation = feature + '.svg';
-                // console.log(`\n DEVICE ICON: `, iconlocation);
+                console.log(`\n DEVICE ICON: `, iconlocation);
 
                 let device = {
                   "name": device_name,
@@ -82,20 +83,6 @@ class SensorDriver extends Homey.Driver {
                       device.data['measure_battery'] = data[ key ].entity_id;
                 }
 
-                /*LOG data:  { entity_id: 'sensor.power_17',
-                  state: '0',
-                  attributes:
-                   { on: true,
-                     current: 0,
-                     voltage: 235,
-                     unit_of_measurement: 'Watts',
-                     friendly_name: 'Power 17',
-                     homey_device: 'Ubisys bijkeuken',
-                     homey_capability: 'measure_power' },
-                  last_changed: '2018-08-30T18:54:42.471812+00:00',
-                  last_updated: '2018-08-30T18:54:42.471812+00:00',
-                  context: { id: '151f201ab8ab4842bd60e8a274c44eae', user_id: null } } */
-
                 console.log('/n UNIT OF MEASUREMENT: ', unitOffmeasurement);
 
                 if ( unitOffmeasurement.endsWith('kWh') ) {
@@ -107,6 +94,22 @@ class SensorDriver extends Homey.Driver {
                     device.capabilities.push( 'meter_power' );
                     device.data['meter_power'] = data[ key ].entity_id;
                 }
+
+                /* 2018-08-31 22:43:03 [log] [ManagerDrivers] [sensor] { battery: 91,
+                friendly_name: 'iphone van martin',
+                gps_accuracy: 65,
+                latitude: 52.02964031433757,
+                longitude: 5.566989547108957,
+                source_type: 'gps' }
+                Original ENTITY-ID : device_tracker.iphone_van_martin
+                ENTITY-ID without number:  device_tracker.iphone_van_martin
+                2018-08-31 22:43:03 [log] [ManagerDrivers] [sensor] ========================================
+                2018-08-31 22:43:03 [log] [ManagerDrivers] [sensor] ========================================
+                2018-08-31 22:43:03 [log] [ManagerDrivers] [sensor] { auto: true,
+                entity_id: [ 'device_tracker.iphone_van_martin' ],
+                friendly_name: 'all devices',
+                hidden: true,
+                order: 0 }*/
 
                 devices.push( device );
 

@@ -1,6 +1,6 @@
 {
   "id": "community.rebels.hassio",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "compatibility": ">=1.5.0",
   "sdk": 2,
   "name": {
@@ -21,6 +21,71 @@
     "name": "Bas Jansen",
     "email": "b@sjansen.email"
   },
+  "capabilities": {
+   "phone_docked": {
+     "type": "enum",
+     "title": {
+       "en": "Phone",
+       " nl": "Telefoon"
+     },
+     "options": {
+        "icons": {
+            "Heating_Demand": "/community.rebels.hassio/drivers/sensor/assets/phone_docked.svg"
+        }
+     },
+     "getable": true,
+     "setable": false,
+     "values": [
+       {
+         "id": "Unplugged",
+         "title": {
+           "en": "Unplugged",
+           "nl": "Losgekoppeld"
+         }
+       },
+       {
+         "id": "Charging",
+         "title": {
+           "en": "Charging",
+           "nl": "Opladen"
+         }
+       },
+       {
+         "id": "Full",
+         "title": {
+           "en": "Full",
+           "nl": "Opgeladen"
+         }
+       },
+       {
+         "id": "Unknown",
+         "title": {
+           "en": "Unknown",
+           "nl": "Onbekend"
+         }
+       }
+     ]
+   },
+   "phone_location": {
+     "type": "boolean",
+     "title": {
+       "en": "Presence",
+       "nl": "Aanwezigheid"
+     },
+     "getable": true,
+     "setable": false,
+        "label": {
+            "true": {
+                "en": "At Home",
+                "nl": "Thuis"
+            },
+            "false": {
+                "en": "Away",
+                "nl": "Afwezig"
+            }
+        }
+    }
+ },
   "drivers": [
     {
     "id": "light",

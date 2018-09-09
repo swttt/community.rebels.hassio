@@ -1,12 +1,30 @@
 'use strict';
 
-// SETTINGS
-const IP = "192.168.2.16"
-const PORT = "8123"
-const PASSWORD = ""
+const Homey = require('homey')
+
+let ADDRESS = "http://192.168.1.1"
+let PORT = "8123"
+let PASSWORD = ""
+
+if (Homey.ManagerSettings.get('URL')) {
+  console.log('URL Defined in APP settings: ', Homey.ManagerSettings.get('URL'));
+  // ADDRESS = Homey.ManagerSettings.get('URL');
+}
+if (Homey.ManagerSettings.get('port')) {
+  console.log('port Defined in APP settings: ', Homey.ManagerSettings.get('port'));
+  // PORT = Homey.ManagerSettings.get('port');
+}
+if (Homey.ManagerSettings.get('password')) {
+  console.log('password Defined in APP settings: ', Homey.ManagerSettings.get('password'));
+  // PASSWORD = Homey.ManagerSettings.get('password');
+}
+
+// console.log('CURRENT ADDRESS: ', ADDRESS);
+// console.log('CURRENT PORT: ', PORT);
+// console.log('CURRENT PASSWORD: ', PASSWORD);
+
 
 // LIBS
-const Homey = require( 'homey' );
 const EventBus = require( 'eventbusjs' );
 const EventSource = require( 'eventsource' )
 const axios = require( 'axios' )
@@ -20,13 +38,17 @@ const config = {
 }
 
 // ESS
-const url = "http://" + IP + ":" + PORT + "/api/stream"
+// const url = "http://" + IP + ":" + PORT + "/api/stream"
+
+const url = ADDRESS + ":" + PORT + "/api/stream"
+
 var es = new EventSource( url, config );
 
 // REST
 const http = axios.create( {
-  baseURL: 'http://' + IP + ':' + PORT + '/api/',
-  timeout: 1000,
+  //baseURL: 'http://' + IP + ':' + PORT + '/api/',
+  baseURL: ADDRESS + ":" + PORT + "/api/",
+  timeout: 5000,
   config
 } );
 

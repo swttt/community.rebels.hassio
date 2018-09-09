@@ -16,7 +16,8 @@ const capability_type = {
   "measure_power": 'floatvalue',
   "meter_power": 'floatvalue',
   "alarm_water": 'switch',
-  "measure_luminance": 'intvalue'
+  "measure_luminance": 'intvalue',
+  "phone_docked": 'string'
 };
 
 const EventBus = require( 'eventbusjs' );
@@ -104,8 +105,12 @@ class SensorDevice extends Homey.Device {
                 this.setCapabilityValue( capability, false )
               }
               break;
+              case "string":
+                this.log(`${capability_type[type]} value changed for `, capability);
+                this.setCapabilityValue( capability, data.state.toString() );
+                break;
             default:
-              this.log('Type not defined for ', capability);
+              this.log('Type not within cases defined for ', capability);
           }
       }
     }
@@ -119,6 +124,7 @@ class SensorDevice extends Homey.Device {
           this.setCapabilityValue( capability, parseInt(data.state, 10) );
         }
     }
+
   }
 
 }
